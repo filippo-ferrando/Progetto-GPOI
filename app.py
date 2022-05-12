@@ -111,10 +111,22 @@ class raspberry():
             os._exit(0)
 
         http = requests.post(self.api,data={'uid' : uid, 'password' : self.password, 'modalita' : "modalita"})
-        print(http.text)
+        #print(http.text)
         logging.debug(f"{datetime.now()} - UID {uid} Sended")
         return http.text
 
+    def startup(self):
+        GPIO.output(self.Gled, GPIO.HIGH)
+        GPIO.output(self.Rled, GPIO.HIGH)
+        self.buzzer.on()
+        time.sleep(0.7)
+        self.buzzer.off()
+        time.sleep(0.3)
+        self.buzzer.on()
+        time.sleep(0.7)
+        self.buzzer.off()
+        GPIO.output(self.Gled, GPIO.LOW)
+        GPIO.output(self.Rled, GPIO.LOW)
 
     def bip(self, resp):
         if resp == "si":
@@ -151,8 +163,14 @@ rasp = raspberry()
 #controlList = tagController()
 #controlList.start()
 
+rasp.startup()
+
+
 while True:
-    time.sleep(3)
-    uid = rasp.reader()
-    resp = rasp.send(uid)
-    rasp.bip(resp)
+    try: 
+        time.sleep(3)
+        uid = rasp.reader()
+        resp = rasp.send(uid)
+        rasp.bip(resp)
+    except KeyboardInterrupt:
+        print("chiudo")
