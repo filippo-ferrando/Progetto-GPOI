@@ -1,37 +1,28 @@
-## Welcome to GitHub Pages
+# RFID reader with a Raspberry Pi
 
-You can use the [editor on GitHub](https://github.com/filippo-ferrando/RFID-raspberrypi-reader/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+## Scope
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+This project was created for a school project, the goal was to create a **totem** for school attendance that would check if the student was present on the database and would therefore register everyone's entries and exits.
 
-### Markdown
+## Result
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+The code published on this repository allows the creation of an attendance control system, this manages errors related to the internet connection mainly, it is structured so that the raspberry cannot be used for other purposes, to avoid compromises by unauthorized personnel.
+We have built and tested everything we have written (and built) obtaining a good result.
 
-```markdown
-Syntax highlighted code block
+## Functioning
+The operation is very simple, the raspberry pi is always waiting for an RFID tag, when this is passed a request is forwarded to our webAPI which checks the authenticity of the scanned UID.
+An audible and visual signal will signal the success or failure of the reading
+The daemon script will be used to restart the reading process in case it is interrupted or stopped in any way.
+This file must be inserted in the raspberry *.bashrc* file in order to be started automatically at each start, the script can start the program autonomously for reading.
 
-# Header 1
-## Header 2
-### Header 3
+## Technology Used
+We used:
+ - Raspberry Pi 3
+ - RC522 RFID sensor
+ - couple of LEDs
+ - 3D printed box
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/filippo-ferrando/RFID-raspberrypi-reader/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+## Credit
+This project was developed with the help of:
+ - [Michele Alladio](https://github.com/MicheleAlladioAKAMich)
+ - [Samuele Forneris](https://github.com/samu4ne)
