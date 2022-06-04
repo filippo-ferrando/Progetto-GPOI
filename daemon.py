@@ -3,14 +3,15 @@ import psutil
 import time
 from datetime import datetime
 import logging
+from lib.config import LOGGING_FILE, PID_FILE_NAME
 
-logging.basicConfig(filename="/home/pi/log/pid-log.log", encoding="utf-8", level=logging.DEBUG)
+logging.basicConfig(filename=LOGGING_FILE, encoding="utf-8", level=logging.DEBUG)
 
 
 while True:
     
     try:
-        with open("/home/pi/pid.txt") as f:
+        with open(PID_FILE_NAME) as f:
             lines = f.readlines()
             logging.debug(f"PID = {lines[0]}") #PID from the main process
             for proc in psutil.process_iter():

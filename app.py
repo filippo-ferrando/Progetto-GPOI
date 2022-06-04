@@ -1,15 +1,5 @@
-import requests
-import threading as thr
-from datetime import datetime
-import time
-import urllib.request
-import os
-import logging
-import foo
-
-from pirc522 import RFID
-import RPi.GPIO as GPIO
-from gpiozero import Buzzer
+import lib.config
+import lib.foo
 
 #global offsetTagDict
 #offsetTagDict = {}
@@ -18,10 +8,10 @@ GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 
 # LOGGING PLATFORM
-LOGGING_FILE = "/home/pi/log/log.log"
-logging.basicConfig(filename=LOGGING_FILE, encoding="utf-8", level=logging.DEBUG)
+logging.basicConfig(filename=config.LOGGING_FILE, encoding="utf-8", level=logging.DEBUG)
 
-f = open("/home/pi/pid.txt", "w")
+#PID CONTROL
+f = open("config.PID_FILE_NAME", "w")
 f.write(f"{os.getpid()}")
 f.close()
 
@@ -31,6 +21,13 @@ def connect(host='http://google.com'):
         return True
     except:
         return False
+
+def connection_control():
+    if connect():
+        logging.debug(f"Connected to internet")
+    else:
+        logging.debug(f"{datetime.now()} - Killing process")
+        os._exit(0)
 
 '''
 class tagController(thr.Thread):
@@ -49,20 +46,22 @@ class tagController(thr.Thread):
 
 class raspberry():
     def __init__(self):
+        #NETSONS CRED
         self.api = foo.API_LINK
         self.password = foo.RASP_PASSWORD
+
+        #LED SETUP
         self.Rled = 11
         GPIO.setup(self.Rled,GPIO.OUT)
         self.Gled = 13
         GPIO.setup(self.Gled,GPIO.OUT)
+
+        #BUZZER SETUP
         self.buzzer = Buzzer(26)
         self.rc522 = RFID()
 
-        if connect():
-            logging.debug(f"Connected to internet")
-        else:
-            logging.debug(f"{datetime.now()} - Killing process")
-            os._exit(0)
+
+        connection_control()
 
     def reader(self):
         #global offsetTagDict
@@ -84,6 +83,7 @@ class raspberry():
 
             return uid
         except:
+            #READING FAILED
             print("chiusura")
             logging.critical(f"{datetime.now()} - killing process")
         '''
@@ -104,11 +104,7 @@ class raspberry():
             http = requests.post(self.api,data={'uid' : uid, 'password' : self.password, 'modalita' : "modalita"})
             return http.text
         '''
-        if connect():
-            logging.debug(f"{datetime.now()} - Connected to internet")
-        else:
-            logging.critical(f"{datetime.now()} - Not connected : Cannot send info")
-            os._exit(0)
+        connection_control()
 
         http = requests.post(self.api,data={'uid' : uid, 'password' : self.password, 'modalita' : "modalita"})
         #print(http.text)
@@ -116,6 +112,7 @@ class raspberry():
         return http.text
 
     def startup(self):
+        #IN HEADLESS MODE YOU CAN LISTEN TO THE STARTUP SOUND
         GPIO.output(self.Gled, GPIO.HIGH)
         GPIO.output(self.Rled, GPIO.HIGH)
         self.buzzer.on()
@@ -129,6 +126,7 @@ class raspberry():
         GPIO.output(self.Rled, GPIO.LOW)
 
     def bip(self, resp):
+        #POSITIVE OR NEGATIVE RESPONSE (DEPENDS ON API RESPONSE)
         if resp == "si":
             logging.debug(f"{datetime.now()} - Positive Response")
             GPIO.output(self.Gled, GPIO.HIGH)
@@ -157,20 +155,25 @@ class raspberry():
         time.sleep(1)
         GPIO.output(self.Rled, GPIO.LOW)
     '''    
-        
-rasp = raspberry()
-
-#controlList = tagController()
-#controlList.start()
-
-rasp.startup()
 
 
-while True:
-    try: 
-        time.sleep(3)
-        uid = rasp.reader()
-        resp = rasp.send(uid)
-        rasp.bip(resp)
-    except KeyboardInterrupt:
-        print("chiudo")
+def main():
+    rasp = raspberry()
+
+    #controlList = tagController()
+    #controlList.start()
+
+    rasp.startup()
+
+
+    while True:
+        try: 
+            time.sleep(3)
+            uid = rasp.reader()
+            resp = rasp.send(uid)
+            rasp.bip(resp)
+        except KeyboardInterrupt:
+            print("chiudo")
+
+if "__name__" == "__main__":
+    main()

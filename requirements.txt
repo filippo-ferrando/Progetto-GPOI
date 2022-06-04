@@ -4,3 +4,4 @@ logging
 datetime
 gpiozero
 psutil
+requests
